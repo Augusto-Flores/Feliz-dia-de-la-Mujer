@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homenaje Especial para Ti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #9b59b6;
+            --secondary: #ff7675;
+            --accent: #fd79a8;
+            --bg: #0f0c29;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #0f0c29;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        #petals-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative; z-index: 10;
+        }
+
+        .hero h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(3rem, 8vw, 5rem);
+            text-shadow: 0 0 20px var(--accent);
+            margin: 10px;
+        }
+
+        /* Grid de 4 Tarjetas */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto 100px auto;
+            padding: 20px;
+            position: relative; z-index: 10;
+        }
+
+        .label-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .label-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .label-card h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .btn-gift {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .btn-gift:hover {
+            box-shadow: 0 0 20px var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* Ventana Modal de Poemas */
+        .poem-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+
+        .poem-content {
+            background: linear-gradient(135deg, #2c3e50, #000);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 500px;
+            width: 80%;
+            text-align: center;
+            border: 2px solid var(--accent);
+            position: relative;
+            animation: zoomIn 0.4s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 25px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .poem-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.6rem;
+            line-height: 1.6;
+            color: #ffdeeb;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="petals-canvas"></canvas>
+
+    <main>
+        <section class="hero">
+            <h1>Para una Mujer Especial</h1>
+            <p>Tengo 4 mensajes guardados para ti...</p>
+        </section>
+
+        <div class="grid-container">
+            <div class="label-card">
+                <h3>Tu Valentía</h3>
+                <button class="btn-gift" onclick="openPoem(1)">
+                    <i class="fas fa-gift"></i> Abrir Regalo
+                </button>
+            </div>
+
+            <div class="label-card">
+                <h3>Tu Brillo</h3>
+                <button class="btn-gift" onclick="openPoem(2)">
+                    <i class="fas fa-gift"></i> Abrir Regalo
+                </button>
+            </div>
+
+            <div class="label-card">
+                <h3>Tu Fuerza</h3>
+                <button class="btn-gift" onclick="openPoem(3)">
+                    <i class="fas fa-gift"></i> Abrir Regalo
+                </button>
+            </div>
+
+            <div class="label-card">
+                <h3>Tu Esencia</h3>
+                <button class="btn-gift" onclick="openPoem(4)">
+                    <i class="fas fa-gift"></i> Abrir Regalo
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="poemModal" class="poem-modal" onclick="closePoem()">
+        <div class="poem-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closePoem()">&times;</span>
+            <div id="poemBody" class="poem-text"></div>
+        </div>
+    </div>
+
+    <script>
+        const poemas = {
+            1: "Eres la prueba de que no se necesita capa para ser una heroína. Tu valentía para enfrentar cada día inspira a todo el que te rodea.",
+            2: "Tu brillo no depende del sol, sino de la luz que llevas dentro. Nunca dejes que nadie opaque esa chispa única que tienes.",
+            3: "Fuerte como un roble, pero con la ternura de una flor. Tu capacidad de transformar el dolor en poder es tu mayor virtud.",
+            4: "No hay nadie como tú en este mundo. Tu esencia es un regalo para quienes tenemos el honor de conocerte. ¡Feliz día!"
+        };
+
+        function openPoem(id) {
+            document.getElementById('poemBody').innerText = poemas[id];
+            document.getElementById('poemModal').style.display = 'flex';
+        }
+
+        function closePoem() {
+            document.getElementById('poemModal').style.display = 'none';
+        }
+
+        // Sistema de Pétalos
+        const canvas = document.getElementById('petals-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const petals = [];
+        class Petal {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 8 + 4;
+                this.speed = Math.random() * 1.5 + 0.5;
+                this.angle = Math.random() * 360;
+                this.spin = Math.random() * 1.5 - 0.75;
+            }
+            draw() {
+                ctx.save(); ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle * Math.PI / 180);
+                ctx.fillStyle = 'rgba(253, 121, 168, 0.6)';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size/2, 0, 0, Math.PI * 2);
+                ctx.fill(); ctx.restore();
+            }
+            update() {
+                this.y += this.speed;
+                this.angle += this.spin;
+                if (this.y > canvas.height) {
+                    this.y = -20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        for (let i = 0; i < 50; i++) petals.push(new Petal());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            petals.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
